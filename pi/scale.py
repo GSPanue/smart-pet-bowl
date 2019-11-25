@@ -47,6 +47,8 @@ class Scale:
 
       while True:
         val = max(0, int(hx.get_weight(5)))
+
+        # Print weight in grams
         print("Weight: " + str(val) + "g")
 
         hx.power_down()
