@@ -3,7 +3,7 @@
 from scale import Scale
 
 # Set DT, SCK, and calibration factor respectively
-scale = Scale(5, 6, 358)
+scale = Scale(5, 6, 412)
 
 # Start the scale
 scale.start()
