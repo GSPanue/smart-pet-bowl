@@ -1,6 +1,6 @@
 <h1 align="center">Smart Pet Bowl</h1>
 
-<div align="center>
+<div align="center">
 Computer Science Project for Final Year
 </div>
 
