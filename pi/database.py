@@ -4,6 +4,9 @@ class Database():
   def __init__(self):
     self.database = boto3.resource("dynamodb")
 
+  def set_database(self, database):
+    self.database = database
+
   def get_database(self):
     return self.database
 
