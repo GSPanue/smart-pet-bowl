@@ -5,6 +5,7 @@ import sys
 import RPi.GPIO as GPIO
 from hx711 import HX711
 from database import Database
+import shortuuid
 
 class Scale:
   def __init__(self, device_id, dt, sck, calibration_factor = None):
@@ -15,6 +16,18 @@ class Scale:
 
     if calibration_factor is not None:
       self.calibration_factor = calibration_factor
+
+  def set_db(self, db):
+    self.db = db
+
+  def get_db(self):
+    return self.db
+
+  def set_hx(self, hx):
+    self.hx = hx
+
+  def get_hx(self):
+    return self.hx
 
   def set_device_id(self, device_id):
     self.device_id = device_id
@@ -30,7 +43,9 @@ class Scale:
 
   # Check if device has been bound to an account
   def has_bound_device(self):
-    return self.db.get("Devices", {
+    db = self.get_db()
+
+    return db.get("Devices", {
       "id": self.get_device_id()
     })["account_id"] != "null"
 
