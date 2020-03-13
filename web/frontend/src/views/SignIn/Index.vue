@@ -86,6 +86,7 @@
 <script>
 import{ getAPIURL } from '@/helpers';
 import { isEmail, isLength, equals } from 'validator';
+import store from 'store';
 
 const api = getAPIURL();
 
@@ -191,10 +192,8 @@ export default {
               emailAddress: account.emailAddress,
               password: account.password
             }).then(({ data }) => {
-              /**
-               * @todo: Persist login and navigate to homepage.
-               */
-              console.log(data);
+              store.set('account', data.account);
+              this.$router.push('/');
             }).finally(() => {
               this.loading = false;
             });
