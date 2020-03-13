@@ -45,11 +45,11 @@
 
       <el-row type="flex" justify="center" align="middle">
         <el-col>
-          <h5 v-if="!shouldShowRegister">Don't have an account?
+          <h5 v-if="!shouldShowRegister && !loading">Don't have an account?
             <a class="link" @click="showRegister">Register</a>
           </h5>
 
-          <h5 v-else>Already have an account?
+          <h5 v-else-if="!loading">Already have an account?
             <a class="link" @click="showSignIn">Sign In</a>
           </h5>
         </el-col>
@@ -84,7 +84,10 @@
 </template>
 
 <script>
+import{ getAPIURL } from '@/helpers';
 import { isEmail, isLength, equals } from 'validator';
+
+const api = getAPIURL();
 
 export default {
   data() {
@@ -95,11 +98,15 @@ export default {
         callback(new Error('Please enter your email address.'));
       }
       else if (isRegisterForm) {
-        /**
-         * @todo Check if email address exists...
-         */
-
-        callback();
+        this.axios.get(`${api}/account/exists`, {
+          params: {
+            q: value
+          }
+        }).then(() => {
+          callback(new Error('This email address is already in use.'));
+        }).catch(() => {
+          callback();
+        });
       }
       else {
         callback();
@@ -170,17 +177,40 @@ export default {
       this.$refs['form'].clearValidate('confirmPassword');
     },
     handleSubmit() {
-      // this.loading = true;
+      this.loading = true;
+
       const isSignInForm = !this.shouldShowRegister;
       const form = this.$refs['form'];
 
       form.validate((valid) => {
+        const account = this.form;
+
         if (valid) {
           if (isSignInForm) {
-            /**
-             * @todo Authenticate account...
-             */
+            this.axios.post(`${api}/account/auth`, {
+              emailAddress: account.emailAddress,
+              password: account.password
+            }).then(({ data }) => {
+              /**
+               * @todo: Persist login and navigate to homepage.
+               */
+              console.log(data);
+            }).finally(() => {
+              this.loading = false;
+            });
           }
+          else {
+            this.axios.post(`${api}/account/create`, {
+              emailAddress: account.emailAddress,
+              password: account.password
+            }).finally(() => {
+              this.loading = false;
+              this.showSignIn();
+            });
+          }
+        }
+        else {
+          this.loading = false;
         }
       });
     },
