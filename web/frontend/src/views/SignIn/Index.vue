@@ -194,6 +194,8 @@ export default {
             }).then(({ data }) => {
               store.set('account', data.account);
               this.$router.push('/');
+            }).catch(() => {
+              this.dialogVisible = true;
             }).finally(() => {
               this.loading = false;
             });
@@ -251,5 +253,9 @@ export default {
 .el-dialog__wrapper {
   display: flex;
   align-items: center;
+}
+
+.el-dialog__wrapper >>> .el-dialog__body {
+  padding: 10px 20px;
 }
 </style>
