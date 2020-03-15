@@ -9,7 +9,7 @@ let webSocket = null;
 let webSocketHandlers = null;
 
 const initialState = () => ({
-  ready: false,
+  fetched: false,
   connected: false,
   device: null,
   pet: null,
@@ -19,8 +19,8 @@ const initialState = () => ({
 const store = new Vuex.Store({
   state: initialState,
   getters: {
-    getReady: ({ ready }) => (
-      ready
+    getFetched: ({ fetched }) => (
+      fetched
     ),
     getConnected: ({ connected }) => (
       connected
@@ -36,8 +36,8 @@ const store = new Vuex.Store({
     )
   },
   mutations: {
-    setReady: (store, newReady) => {
-      store.ready = newReady;
+    setFetched: (store, newFetched) => {
+      store.fetched = newFetched;
     },
     setConnected: (store, newConnected) => {
       store.connected = newConnected;
