@@ -17,7 +17,6 @@ exports.handler = async (event) => {
         });
     }
     catch (error) {
-        console.log('CAUGHT IT!');
         if (error.errorCode === 410) {
             database.deleteConnection(connectionId);
         }
