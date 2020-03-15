@@ -9,6 +9,8 @@ const socket = createWebSocket();
 const webSocketPlugin = createWebSocketPlugin(socket);
 
 const initialState = () => ({
+  ready: false,
+  connected: false,
   device: null,
   pet: null,
   readings: []
@@ -17,6 +19,12 @@ const initialState = () => ({
 const store = new Vuex.Store({
   state: initialState,
   getters: {
+    getReady: ({ ready }) => (
+      ready
+    ),
+    getConnected: ({ connected }) => (
+      connected
+    ),
     getDevice: ({ device }) => (
       device
     ),
@@ -28,6 +36,12 @@ const store = new Vuex.Store({
     )
   },
   mutations: {
+    setReady: (store, newReady) => {
+      store.ready = newReady;
+    },
+    setConnected: (store, newConnected) => {
+      store.connected = newConnected;
+    },
     setDevice: (store, newDevice) => {
       store.device = newDevice;
     },
