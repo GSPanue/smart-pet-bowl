@@ -5,7 +5,13 @@ const createWebSocket = () => (
 const createWebSocketHandlers = (store, socket) => {
   socket.onopen = () => {
     console.log('[WS]: Connected to WebSocket');
-    store.commit('setConnected', true);
+
+    const deviceId = store.state.device.id;
+
+    socket.send(JSON.stringify({
+      action: 'setConnection',
+      message: deviceId
+    }));
   }
 
   socket.onclose = () => {
