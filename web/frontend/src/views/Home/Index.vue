@@ -170,6 +170,7 @@ export default {
       'setFetched',
       'setDevice',
       'setPet',
+      'setReadings',
       'resetStore'
     ]),
     handleSubmit() {
@@ -245,11 +246,6 @@ export default {
           id: accountId
         }
       }).then(({ data }) => {
-        /**
-         * @todo Connect to WebSocket after fetching readings
-         */
-        this.createWebSocket();
-
         const deviceId = data.id;
         const petId = data.pet_id;
 
@@ -257,18 +253,31 @@ export default {
           id: deviceId
         });
 
-        return this.axios.get(`${api}/pet/find`, {
-          params: {
-            id: petId
-          }
-        });
-      }).then(({ data }) => {
+        return Promise.all([
+          this.axios.get(`${api}/pet/find`, {
+            params: {
+              id: petId
+            }
+          }),
+          this.axios.get(`${api}/readings/all`, {
+            params: {
+              id: deviceId
+            }
+          })
+        ]);
+      }).then((values) => {
+        const { data: petData } = values[0];
+        const { data: readingsData } = values[1];
+
         this.setPet({
-          name: data.name,
-          species: data.species
+          name: petData.name,
+          species: petData.species
         });
 
+        this.setReadings(readingsData);
         this.setFetched(true);
+
+        this.createWebSocket();
       }).catch((error) => {
         const errorCode = error.response.status;
 
