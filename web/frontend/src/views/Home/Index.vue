@@ -1,72 +1,81 @@
 <template>
-  <el-row
-    v-if="!loading"
-    class="container"
-    type="flex"
-    flexDirection="row"
-    justify="center"
-    align="middle"
-  >
-    <!-- Bind Device Card -->
-    <el-card v-if="!getDevice" class="bind-card">
-      <div class="heading">
-        <span>Bind Device</span>
-      </div>
+  <el-col v-if="!loading" class="container" type="flex" justify="center" align="middle">
+    <!-- Sign Out -->
+    <el-row class="sign-out-container" type="flex" justify="end">
+      <el-button type="primary" size="medium" @click="handleSignOut">
+        Sign Out
+      </el-button>
+    </el-row>
 
-      <!-- Bind Device Form -->
-      <el-form
-        ref="form"
-        :model="form"
-        :rules="formRules"
-        status-icon
-      >
-        <el-form-item
-          class="form-item"
-          label="Device ID"
-          prop="deviceId"
+    <!-- Content -->
+    <el-row
+      class="card-container"
+      type="flex"
+      flexDirection="row"
+      justify="center"
+      align="middle"
+    >
+      <!-- Bind Device Card -->
+      <el-card v-if="!getDevice" class="bind-card">
+        <div class="heading">
+          <span>Bind Device</span>
+        </div>
+
+        <!-- Bind Device Form -->
+        <el-form
+          ref="form"
+          :model="form"
+          :rules="formRules"
+          status-icon
         >
-          <el-input v-model="form.deviceId" size="small" :disabled="submitting" />
-        </el-form-item>
-
-        <el-row type="flex">
-          <el-col>
-            <el-form-item
-              class="form-item"
-              label="Pet Name"
-              prop="petName"
-            >
-              <el-input v-model="form.petName" size="small" :disabled="submitting" />
-            </el-form-item>
-          </el-col>
-          <el-col :offset="2">
-            <el-form-item
-              class="form-item"
-              label="Pet Species"
-              prop="petSpecies"
-            >
-              <el-input v-model="form.petSpecies" size="small" :disabled="submitting" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-form-item class="button-container" align="right">
-          <el-button
-            class="bind-button"
-            type="primary"
-            size="medium"
-            :loading="submitting"
-            @click="handleSubmit"
+          <el-form-item
+            class="form-item"
+            label="Device ID"
+            prop="deviceId"
           >
-            Submit
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+            <el-input v-model="form.deviceId" size="small" :disabled="submitting" />
+          </el-form-item>
 
-    <el-card v-else>
-      Main
-    </el-card>
-  </el-row>
+          <el-row type="flex">
+            <el-col>
+              <el-form-item
+                class="form-item"
+                label="Pet Name"
+                prop="petName"
+              >
+                <el-input v-model="form.petName" size="small" :disabled="submitting" />
+              </el-form-item>
+            </el-col>
+            <el-col :offset="2">
+              <el-form-item
+                class="form-item"
+                label="Pet Species"
+                prop="petSpecies"
+              >
+                <el-input v-model="form.petSpecies" size="small" :disabled="submitting" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-form-item class="button-container" align="right">
+            <el-button
+              class="bind-button"
+              type="primary"
+              size="medium"
+              :loading="submitting"
+              @click="handleSubmit"
+            >
+              Submit
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+
+      <el-card v-else>
+        Main
+      </el-card>
+    </el-row>
+  </el-col>
 </template>
 
 <script>
@@ -147,7 +156,8 @@ export default {
   methods: {
     ...mapMutations([
       'setDevice',
-      'setPet'
+      'setPet',
+      'resetStore'
     ]),
     handleSubmit() {
       this.submitting = true;
@@ -196,6 +206,11 @@ export default {
           this.submitting = false;
         }
       });
+    },
+    handleSignOut() {
+      store.remove('account');
+      this.$router.push('/signin');
+      this.resetStore();
     },
     loadApp() {
       loadingInstance = Loading.service({
@@ -272,6 +287,12 @@ export default {
 <style scoped>
 .container {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-container {
+  flex: 1;
 }
 
 .bind-card {
@@ -298,5 +319,9 @@ export default {
 
 .bind-button {
   width: 100%;
+}
+
+.sign-out-container {
+  padding: 10px;
 }
 </style>
