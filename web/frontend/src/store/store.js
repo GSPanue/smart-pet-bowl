@@ -64,6 +64,12 @@ const store = new Vuex.Store({
       webSocket = createWebSocket();
       webSocketHandlers = createWebSocketHandlers(context, webSocket);
     },
+    destroyWebSocket: () => {
+      webSocket.close();
+
+      webSocket = null;
+      webSocketHandlers = null;
+    },
     sendMessage: (context, message) => {
       socket.send(JSON.stringify(message));
     }
