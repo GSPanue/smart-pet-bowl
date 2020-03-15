@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { Loading } from 'element-ui';
 import store from 'store';
 import { isLength } from 'validator';
@@ -93,8 +93,16 @@ let loadingInstance = null;
 export default {
   computed: {
     ...mapGetters([
+      'getFetched',
+      'getConnected',
       'getDevice'
-    ])
+    ]),
+    shouldShowApp() {
+      const hasFetched = this.getFetched;
+      const isConnected = this.getConnected
+
+      return hasFetched && isConnected;
+    }
   },
   data() {
     const checkDeviceId = (rule, value, callback) => {
@@ -154,7 +162,12 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'createWebSocket',
+      'destroyWebSocket'
+    ]),
     ...mapMutations([
+      'setFetched',
       'setDevice',
       'setPet',
       'resetStore'
@@ -208,8 +221,15 @@ export default {
       });
     },
     handleSignOut() {
+      const isConnectedToWebSocket = this.getConnected;
+
       store.remove('account');
       this.$router.push('/signin');
+
+      if (isConnectedToWebSocket) {
+        this.destroyWebSocket();
+      }
+
       this.resetStore();
     },
     loadApp() {
@@ -225,6 +245,11 @@ export default {
           id: accountId
         }
       }).then(({ data }) => {
+        /**
+         * @todo Connect to WebSocket after fetching readings
+         */
+        this.createWebSocket();
+
         const deviceId = data.id;
         const petId = data.pet_id;
 
@@ -243,14 +268,7 @@ export default {
           species: data.species
         });
 
-        /**
-         * @todo Connect to WebSocket
-         * @todo Get all readings
-         * @todo Listen for new readings
-         */
-
-        this.loading = false;
-        loadingInstance.close();
+        this.setFetched(true);
       }).catch((error) => {
         const errorCode = error.response.status;
 
@@ -280,6 +298,14 @@ export default {
   },
   mounted() {
     this.loadApp();
+  },
+  watch: {
+    shouldShowApp(state) {
+      if (state) {
+        this.loading = false;
+        loadingInstance.close();
+      }
+    }
   }
 }
 </script>
