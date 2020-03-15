@@ -25,7 +25,7 @@ const store = new Vuex.Store({
     setPet: (store, newPet) => {
       store.pet = newPet;
     },
-    resetApp: (store) => {
+    resetStore: (store) => {
       const state = initialState();
 
       Object.keys(state).forEach((key) => {
