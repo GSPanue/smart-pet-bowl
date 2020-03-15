@@ -3,11 +3,13 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+const initialState = () => ({
+  device: null,
+  pet: null
+});
+
 const store = new Vuex.Store({
-  state: {
-    device: null,
-    pet: null
-  },
+  state: initialState,
   getters: {
     getDevice: ({ device }) => (
       device
@@ -22,6 +24,13 @@ const store = new Vuex.Store({
     },
     setPet: (store, newPet) => {
       store.pet = newPet;
+    },
+    resetApp: (store) => {
+      const state = initialState();
+
+      Object.keys(state).forEach((key) => {
+        store[key] = state[key]
+      });
     }
   }
 });
