@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { createWebSocket, createWebSocketPlugin } from '@/helpers';
+import { createWebSocket, createWebSocketHandlers } from '@/helpers';
 
 Vue.use(Vuex);
 
-const socket = createWebSocket();
-const webSocketPlugin = createWebSocketPlugin(socket);
+let webSocket = null;
+let webSocketHandlers = null;
 
 const initialState = () => ({
   ready: false,
@@ -60,11 +60,14 @@ const store = new Vuex.Store({
     }
   },
   actions: {
+    createWebSocket: (context) => {
+      webSocket = createWebSocket();
+      webSocketHandlers = createWebSocketHandlers(context, webSocket);
+    },
     sendMessage: (context, message) => {
       socket.send(JSON.stringify(message));
     }
-  },
-  plugins: [webSocketPlugin]
+  }
 });
 
 export default store;
