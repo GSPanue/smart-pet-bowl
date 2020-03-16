@@ -4,12 +4,14 @@
     "build": "webpack -p --config ./config/webpack.prod.config.babel.js"
   },
   "dependencies": {
+    "apexcharts": "^3.16.1",
     "axios": "^0.19.2",
     "element-ui": "^2.13.0",
     "short-uuid": "^3.1.1",
     "store": "^2.0.12",
     "validator": "^12.2.0",
     "vue": "^2.6.11",
+    "vue-apexcharts": "^1.5.2",
     "vue-axios": "^2.1.5",
     "vue-router": "^3.1.6",
     "vuex": "^3.1.2"
