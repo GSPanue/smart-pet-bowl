@@ -84,7 +84,7 @@ import { Loading } from 'element-ui';
 import store from 'store';
 import { isLength } from 'validator';
 import shortUUID from 'short-uuid';
-import { getAPIURL } from '@/helpers';
+import { getAPIURL, sortByDate } from '@/helpers';
 
 const api = getAPIURL();
 
@@ -274,7 +274,7 @@ export default {
           species: petData.species
         });
 
-        this.setReadings(readingsData);
+        this.setReadings(sortByDate(readingsData));
         this.setFetched(true);
 
         this.createWebSocket();
