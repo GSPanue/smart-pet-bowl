@@ -4,12 +4,12 @@ import time
 import sys
 import RPi.GPIO as GPIO
 from hx711 import HX711
-from database import Database
+from api import API
 import shortuuid
 
 class Scale:
   def __init__(self, device_id, dt, sck, calibration_factor = None):
-    self.db = Database()
+    self.api = API()
     self.hx = HX711(dt, sck)
     self.device_id = device_id
     self.calibration_factor = 1
@@ -17,11 +17,11 @@ class Scale:
     if calibration_factor is not None:
       self.calibration_factor = calibration_factor
 
-  def set_db(self, db):
-    self.db = db
+  def set_api(self, api):
+    self.api = api
 
-  def get_db(self):
-    return self.db
+  def get_api(self):
+    return self.api
 
   def set_hx(self, hx):
     self.hx = hx
@@ -43,11 +43,11 @@ class Scale:
 
   # Check if device has been bound to an account
   def has_bound_device(self):
-    db = self.get_db()
+    api = self.get_api()
 
-    return db.get("Devices", {
-      "id": self.get_device_id()
-    })["account_id"] != "null"
+    return api.get("device/exists", {
+      "q": self.get_device_id()
+    }).status_code == 200
 
   # Get current weight in the form of an integer
   def get_weight(self):
@@ -65,32 +65,46 @@ class Scale:
     self.hx.power_down()
     self.hx.power_up()
 
+  # Store reading in database
+  def store_reading(self, weight):
+    api = self.get_api()
+
+    api.post("readings/create", {
+      "id": shortuuid.uuid(),
+      "deviceId": self.get_device_id(),
+      "timestamp": int(time.time() * 1000),
+      "weight": weight
+    })
+
   # Start the scale
   def start(self):
+    print("Preparing scales. Do not add weight to the scale...")
+    self.configure_hx()
+    print("Preparation complete.")
+
     try:
       # Check if device has been bound to an account
-      print("Checking if device has been bound to an account...")
+      print("\nChecking if device has been bound to an account...")
       has_bound_device = self.has_bound_device()
 
       while not has_bound_device:
         print("Device has not been bound to an account.")
-        print("Checking again in 60 seconds...")
+        print("Checking again in 10 seconds...")
 
-        time.sleep(60)
+        time.sleep(10)
 
         has_bound_device = self.has_bound_device()
 
-      print("Preparing scales. Do not add weight to the scale...")
-      self.configure_hx()
-
-      print("Preparation complete.")
-      raw_input("Add weight to the scale and press `Enter` to continue...")
+      print("Device has already been bound to an account. Starting scales....\n")
 
       while True:
         weight = self.get_weight()
 
-        # Print weight in grams
-        print("Weight: " + str(weight) + "g")
+        # Store weight
+        self.store_reading(weight)
+
+        # Print weight stored in grams
+        print("Current Weight: " + str(weight) + "g")
 
         self.restart_hx()
         time.sleep(0.1)
