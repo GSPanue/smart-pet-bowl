@@ -9,7 +9,7 @@ const config = {
   output: {
     path: path.join(root, 'dist/js'),
     publicPath: '/js/',
-    filename:'bundle.min.js',
+    filename: 'bundle.min.js'
   },
   module: {
     rules: [
