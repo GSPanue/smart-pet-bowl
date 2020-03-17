@@ -403,6 +403,10 @@ export default {
   padding-top: 15px;
 }
 
+.table {
+  color: #303133;
+}
+
 .table >>> .el-table__row > td {
   background-color: initial !important;
 }
