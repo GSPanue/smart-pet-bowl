@@ -71,9 +71,30 @@
         </el-form>
       </el-card>
 
-      <el-card v-else>
-        Main
-      </el-card>
+      <el-col
+        v-else
+        type="flex"
+        class="data-container"
+      >
+        <el-row>
+          <el-card>
+            Main
+          </el-card>
+        </el-row>
+        <el-row class="table-container">
+          <el-card>
+            <el-table
+              class="table"
+              :data="createTableData()"
+              size="small"
+            >
+              <el-table-column property="name" label="Name" />
+              <el-table-column property="species" label="Species" />
+              <el-table-column property="weight" label="Current Weight" align="center" />
+            </el-table>
+          </el-card>
+        </el-row>
+      </el-col>
     </el-row>
   </el-col>
 </template>
@@ -95,7 +116,9 @@ export default {
     ...mapGetters([
       'getFetched',
       'getConnected',
-      'getDevice'
+      'getDevice',
+      'getPet',
+      'getReadings'
     ]),
     shouldShowApp() {
       const hasFetched = this.getFetched;
@@ -295,6 +318,18 @@ export default {
         }
       });
     },
+    createTableData() {
+      const pet = this.getPet;
+      const readings = this.getReadings;
+      const latestWeight = (readings.length > 0) ?
+        (readings[readings.length - 1].weight) : 0;
+
+      return [{
+        name: pet.name,
+        species: pet.species,
+        weight: `${latestWeight}g`
+      }];
+    },
     resetState() {
       this.loading = true;
       this.submitting = false;
@@ -358,5 +393,24 @@ export default {
 
 .sign-out-container {
   padding: 10px;
+}
+
+.data-container {
+  max-width: 680px;
+}
+
+.table-container {
+  padding-top: 15px;
+}
+
+.table >>> .el-table__row > td {
+  background-color: initial !important;
+}
+
+.table >>> th.is-leaf {
+  padding-top: 0px;
+  padding-bottom: 8px;
+  font-weight: 600;
+  color: #303133;
 }
 </style>
