@@ -14,7 +14,9 @@ import {
   FormItem,
   Input,
   Button,
-  Dialog
+  Dialog,
+  Table,
+  TableColumn
 } from 'element-ui';
 
 Vue.use(VueRouter);
@@ -28,6 +30,8 @@ Vue.use(FormItem);
 Vue.use(Input);
 Vue.use(Button);
 Vue.use(Dialog);
+Vue.use(Table);
+Vue.use(TableColumn);
 
 export default new Vue({
   store,
