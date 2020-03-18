@@ -126,7 +126,7 @@ class Scale:
         print("Current Weight: " + str(weight) + "g")
 
         self.restart_hx()
-        time.sleep(0.1)
+        time.sleep(10)
 
     except (KeyboardInterrupt, SystemExit):
       self.stop()
