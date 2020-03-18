@@ -82,7 +82,7 @@
               There is no data to display. Waiting for new data...
             </div>
             <div v-else-if="hasInsufficientReadings">
-              Accumulating data for chart... This may take up to 5 minutes.
+              Accumulating data for the chart... This may take up to 5 minutes.
             </div>
             <div v-else>
               <h3 class="chart-heading">Smart Pet Bowl</h3>
