@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 from hx711 import HX711
 from api import API
 import shortuuid
+import socket
 
 class Scale:
   def __init__(self, device_id, dt, sck, calibration_factor = None):
@@ -40,6 +41,15 @@ class Scale:
 
   def get_calibration_factor(self):
     return self.calibration_factor
+
+  # Check if device is connected to the internet
+  def is_connected(self):
+    try:
+      socket.create_connection(("www.google.com", 80))
+      return True
+    except:
+      pass
+    return False
 
   # Check if device has been bound to an account
   def has_bound_device(self):
@@ -81,6 +91,15 @@ class Scale:
     print("Preparing scales. Do not add weight to the scale...")
     self.configure_hx()
     print("Preparation complete.")
+
+    print("\nChecking if device is connected to the internet...")
+    connected = self.is_connected()
+
+    while not connected:
+      print("Device is not connected. Trying again...")
+      connected = self.is_connected()
+
+    print("Device is connected to the internet.")
 
     try:
       # Check if device has been bound to an account
