@@ -10,11 +10,13 @@ exports.handler = async ({ queryStringParameters }) => {
         IndexName: 'device_id-index',
         KeyConditionExpression: '#did = :did',
         ExpressionAttributeNames: {
-            '#did': 'device_id'
+            '#did': 'device_id',
+            '#ts': 'timestamp',
         },
         ExpressionAttributeValues: {
             ':did': deviceId
-        }
+        },
+        ProjectionExpression: '#ts, weight'
     }).promise()).Items;
 
     return {

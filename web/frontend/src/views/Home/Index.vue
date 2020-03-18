@@ -71,9 +71,58 @@
         </el-form>
       </el-card>
 
-      <el-card v-else>
-        Main
-      </el-card>
+      <el-col
+        v-else
+        type="flex"
+        class="data-container"
+      >
+        <el-row>
+          <el-card>
+            <div v-if="!hasReadings">
+              There is no data to display. Waiting for new data...
+            </div>
+            <div v-else-if="hasInsufficientReadings">
+              Accumulating data for the chart... This may take up to 5 minutes.
+            </div>
+            <div v-else>
+              <h3 class="chart-heading">Smart Pet Bowl</h3>
+              <el-button
+                size="small"
+                @click="handleRange('ALL')"
+                :disabled="showAll"
+              >
+                ALL
+              </el-button>
+              <el-button
+                size="small"
+                @click="handleRange('24H')"
+                :disabled="!showAll"
+              >
+                24H
+              </el-button>
+              <vue-apex-charts
+                type="area"
+                :series="createSeries()"
+                :options="createOptions()"
+                height="220"
+              />
+            </div>
+          </el-card>
+        </el-row>
+        <el-row class="table-container">
+          <el-card>
+            <el-table
+              class="table"
+              :data="createTableData()"
+              size="small"
+            >
+              <el-table-column property="name" label="Name" align="center" />
+              <el-table-column property="species" label="Species" align="center" />
+              <el-table-column property="weight" label="Current Weight" align="center" />
+            </el-table>
+          </el-card>
+        </el-row>
+      </el-col>
     </el-row>
   </el-col>
 </template>
@@ -84,6 +133,7 @@ import { Loading } from 'element-ui';
 import store from 'store';
 import { isLength } from 'validator';
 import shortUUID from 'short-uuid';
+import VueApexCharts from 'vue-apexcharts';
 import { getAPIURL, sortByDate } from '@/helpers';
 
 const api = getAPIURL();
@@ -91,17 +141,46 @@ const api = getAPIURL();
 let loadingInstance = null;
 
 export default {
+  components: {
+    VueApexCharts
+  },
   computed: {
     ...mapGetters([
       'getFetched',
       'getConnected',
-      'getDevice'
+      'getDevice',
+      'getPet',
+      'getReadings'
     ]),
     shouldShowApp() {
       const hasFetched = this.getFetched;
       const isConnected = this.getConnected
 
       return hasFetched && isConnected;
+    },
+    hasReadings() {
+      const readings = this.getReadings;
+
+      if (readings) {
+        return readings.length > 0;
+      }
+
+      return false;
+    },
+    hasInsufficientReadings() {
+      const readings = this.getReadings;
+
+      if (readings.length > 1) {
+        const d1 = new Date(readings[0].timestamp);
+        const d2 = new Date(readings[readings.length - 1].timestamp);
+
+        const difference = Math.abs(d1 - d2);
+        const minutes = Math.floor((difference / 1000) / 60);
+
+        return minutes <= 5;
+      }
+
+      return true;
     }
   },
   data() {
@@ -148,6 +227,7 @@ export default {
         petName: '',
         petSpecies: ''
       },
+      showAll: true,
       formRules: {
         deviceId: [
           { validator: checkDeviceId, trigger: 'blur' }
@@ -295,6 +375,106 @@ export default {
         }
       });
     },
+    handleRange(range) {
+      this.showAll = range === 'ALL';
+    },
+    createTableData() {
+      const pet = this.getPet;
+      const readings = this.getReadings;
+      const latestWeight = (readings.length > 0) ?
+        (readings[readings.length - 1].weight) : 0;
+
+      return [{
+        name: pet.name,
+        species: pet.species,
+        weight: `${latestWeight}g`
+      }];
+    },
+    createSeries() {
+      const shouldShowAll = this.showAll;
+      let readings = this.getReadings.map((reading) => ([
+        reading.timestamp,
+        reading.weight
+      ]));
+
+      if (!shouldShowAll) {
+        const yesterdayDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+
+        readings = readings.filter((reading) => {
+          if (new Date(reading[0]) > yesterdayDate) {
+            return true;
+          }
+
+          return false;
+        });
+      }
+
+      return [{
+        name: 'Weight',
+        data: readings
+      }]
+    },
+    createOptions() {
+      return {
+        chart: {
+          zoom: {
+            enabled: true
+          },
+          toolbar: {
+            show: true,
+            tools: {
+              download: false,
+              selection: false,
+              zoom: true,
+              zoomin: true,
+              zoomout: true,
+              pan: false,
+              reset: true
+            }
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        tooltip: {
+          x: {
+            format: 'HH:mm:ss TT, dd MMMM yyyy'
+          }
+        },
+        yaxis: {
+          opposite: true,
+          labels: {
+            formatter: (value) => (
+              `${value}g`
+            )
+          },
+          title: {
+            text: 'Weight (g)'
+          }
+        },
+        xaxis: {
+          type: 'datetime',
+          labels: {
+            show: true,
+            datetimeUTC: true,
+            datetimeFormatter: {
+              year: 'yyyy',
+              month: 'MMMM yyyy',
+              day: 'dd MMMM yyyy',
+              hour: 'HH:mm:ss',
+              minute: 'HH:mm:ss'
+            }
+          },
+          tooltip: {
+            enabled: false
+          }
+        },
+        stroke: {
+          curve: 'straight',
+          width: 3
+        }
+      }
+    },
     resetState() {
       this.loading = true;
       this.submitting = false;
@@ -358,5 +538,37 @@ export default {
 
 .sign-out-container {
   padding: 10px;
+}
+
+.data-container {
+  max-width: 680px;
+}
+
+.chart-heading {
+  font-weight: 500;
+}
+
+div >>> .apexcharts-toolbar {
+  margin-top: -5px;
+  right: 37px !important;
+}
+
+.table-container {
+  padding-top: 15px;
+}
+
+.table {
+  color: #303133;
+}
+
+.table >>> .el-table__row > td {
+  background-color: initial !important;
+}
+
+.table >>> th.is-leaf {
+  padding-top: 0px;
+  padding-bottom: 8px;
+  font-weight: 600;
+  color: #303133;
 }
 </style>
