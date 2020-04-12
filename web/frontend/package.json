@@ -2,7 +2,8 @@
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.dev.config.babel.js",
     "build": "webpack -p --config ./config/webpack.prod.config.babel.js",
-    "test": "jest"
+    "test": "jest",
+    "cypress": "cypress open"
   },
   "dependencies": {
     "apexcharts": "^3.16.1",
@@ -25,6 +26,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-component": "^1.1.1",
     "css-loader": "^3.4.2",
+    "cypress": "^4.3.0",
     "dotenv-webpack": "^1.7.0",
     "file-loader": "^5.1.0",
     "jest": "^25.3.0",
