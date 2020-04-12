@@ -5,7 +5,8 @@
     "build:frontend": "cd frontend && npm run build",
     "start:frontend": "cd frontend && npm start",
     "start": "npm run start:frontend",
-    "test": "cd frontend && npm test"
+    "test:jest": "cd frontend && npm test",
+    "test:cypress": "cd frontend && npm run cypress"
   },
   "dependencies": {
     "npm-run-all": "^4.1.5"
