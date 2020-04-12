@@ -1,5 +1,6 @@
 *.pyc
 **/node_modules
 .env
-**/cypress
-**/cypress.json
+**/cypress/*
+!**/cypress/integration
+cypress.json
