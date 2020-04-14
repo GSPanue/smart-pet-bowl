@@ -53,5 +53,7 @@ const createWebSocketHandlers = (store, socket) => {
 
 export {
   createWebSocket,
+  handleSetConnection,
+  handleSendReading,
   createWebSocketHandlers
 };
