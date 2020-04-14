@@ -2,7 +2,7 @@
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.dev.config.babel.js",
     "build": "webpack -p --config ./config/webpack.prod.config.babel.js",
-    "test": "jest",
+    "test": "jest --verbose",
     "cypress": "cypress open"
   },
   "dependencies": {
